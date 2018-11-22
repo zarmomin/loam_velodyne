@@ -45,6 +45,7 @@ bool ScanRegistration::parseParams(const ros::NodeHandle& nh, RegistrationParams
   bool success = true;
   int iParam = 0;
   float fParam = 0;
+  std::string outputFrame;
 
   if (nh.getParam("scanPeriod", fParam)) {
     if (fParam <= 0) {
@@ -136,6 +137,10 @@ bool ScanRegistration::parseParams(const ros::NodeHandle& nh, RegistrationParams
       ROS_INFO("Set lessFlatFilterSize: %g", fParam);
     }
   }
+  if (nh.getParam("outputFrame", outputFrame)) {
+      config_out.outputFrame = outputFrame;
+      ROS_INFO("Set outputFrame: %s", outputFrame.c_str());
+  }
 
   return success;
 }
@@ -188,14 +193,14 @@ void ScanRegistration::publishResult()
 {
   auto sweepStartTime = toROSTime(sweepStart());
   // publish full resolution and feature point clouds
-  publishCloudMsg(_pubLaserCloud, laserCloud(), sweepStartTime, "/camera");
-  publishCloudMsg(_pubCornerPointsSharp, cornerPointsSharp(), sweepStartTime, "/camera");
-  publishCloudMsg(_pubCornerPointsLessSharp, cornerPointsLessSharp(), sweepStartTime, "/camera");
-  publishCloudMsg(_pubSurfPointsFlat, surfacePointsFlat(), sweepStartTime, "/camera");
-  publishCloudMsg(_pubSurfPointsLessFlat, surfacePointsLessFlat(), sweepStartTime, "/camera");
+  publishCloudMsg(_pubLaserCloud, laserCloud(), sweepStartTime, config().outputFrame);
+  publishCloudMsg(_pubCornerPointsSharp, cornerPointsSharp(), sweepStartTime, config().outputFrame);
+  publishCloudMsg(_pubCornerPointsLessSharp, cornerPointsLessSharp(), sweepStartTime, config().outputFrame);
+  publishCloudMsg(_pubSurfPointsFlat, surfacePointsFlat(), sweepStartTime, config().outputFrame);
+  publishCloudMsg(_pubSurfPointsLessFlat, surfacePointsLessFlat(), sweepStartTime, config().outputFrame);
 
   // publish corresponding IMU transformation information
-  publishCloudMsg(_pubImuTrans, imuTransform(), sweepStartTime, "/camera");
+  publishCloudMsg(_pubImuTrans, imuTransform(), sweepStartTime, config().outputFrame);
 }
 
 } // end namespace loam

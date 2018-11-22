@@ -41,6 +41,7 @@ namespace loam
       const int& maxCornerSharp_ = 2,
       const int& maxSurfaceFlat_ = 4,
       const float& lessFlatFilterSize_ = 0.2,
+      const std::string& outputFrame_ = "/camera",
       const float& surfaceCurvatureThreshold_ = 0.1);
 
     /** The time per scan. */
@@ -66,6 +67,8 @@ namespace loam
 
     /** The voxel size used for down sizing the remaining less flat surface points. */
     float lessFlatFilterSize;
+
+    std::string outputFrame;
 
     /** The curvature threshold below / above a point is considered a flat / corner point. */
     float surfaceCurvatureThreshold;

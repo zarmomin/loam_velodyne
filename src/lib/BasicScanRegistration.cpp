@@ -13,6 +13,7 @@ RegistrationParams::RegistrationParams(const float& scanPeriod_,
                                        const int& maxCornerSharp_,
                                        const int& maxSurfaceFlat_,
                                        const float& lessFlatFilterSize_,
+                                       const std::string& outputFrame_,
                                        const float& surfaceCurvatureThreshold_)
     : scanPeriod(scanPeriod_),
       imuHistorySize(imuHistorySize_),
@@ -22,6 +23,7 @@ RegistrationParams::RegistrationParams(const float& scanPeriod_,
       maxCornerLessSharp(10 * maxCornerSharp_),
       maxSurfaceFlat(maxSurfaceFlat_),
       lessFlatFilterSize(lessFlatFilterSize_),
+      outputFrame(outputFrame_),
       surfaceCurvatureThreshold(surfaceCurvatureThreshold_)
 {};
 
@@ -165,12 +167,6 @@ void BasicScanRegistration::extractFeatures(const uint16_t& beginIdx)
     if (scanEndIdx <= scanStartIdx + 2 * _config.curvatureRegion) {
       continue;
     }
-
-    // Quick&Dirty fix for relative point time calculation without IMU data
-    /*float scanSize = scanEndIdx - scanStartIdx + 1;
-    for (int j = scanStartIdx; j <= scanEndIdx; j++) {
-      _laserCloud[j].intensity = i + _scanPeriod * (j - scanStartIdx) / scanSize;
-    }*/
 
     // reset scan buffers
     setScanBuffersFor(scanStartIdx, scanEndIdx);
