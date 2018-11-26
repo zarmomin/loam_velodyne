@@ -1,6 +1,6 @@
 #include "loam_velodyne/BasicLaserOdometry.h"
 
-#include "math_utils.h"
+#include "loam_velodyne/math_utils.h"
 #include <pcl/filters/filter.h>
 #include <Eigen/Eigenvalues>
 #include <Eigen/QR>

@@ -34,7 +34,7 @@
 
 #include "loam_velodyne/LaserOdometry.h"
 #include "loam_velodyne/common.h"
-#include "math_utils.h"
+#include "loam_velodyne/math_utils.h"
 
 namespace loam
 {

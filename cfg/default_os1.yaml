@@ -1,0 +1,17 @@
+###### Calibration when using the OS1 and having Lidar & Imu in the same pose ######
+scan_period: 0.1
+imu_history_size: 200
+n_feature_regions: 6
+curvature_region: 5
+max_corner_sharp: 2
+max_surface_flat: 4
+output_frame: /camera
+surface_curvature_threshold: 0.1
+T_camera_lidar:
+  rows: 4
+  cols: 4
+  data: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+T_camera_imu:
+  rows: 4
+  cols: 4
+  data: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]

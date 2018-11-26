@@ -38,6 +38,7 @@
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/point_types.h>
 #include "time_utils.h"
+#include <sys/stat.h>
 
 namespace loam {
 
@@ -73,6 +74,11 @@ inline Time fromROSTime(ros::Time const& rosTime)
 inline ros::Time toROSTime(Time const& time_point)
 {
   return ros::Time().fromNSec(std::chrono::duration_cast<std::chrono::nanoseconds>(time_point.time_since_epoch()).count());
+}
+
+inline bool exists(const std::string& name) {
+  struct stat buffer;
+  return (stat (name.c_str(), &buffer) == 0);
 }
 
 } // end namespace loam

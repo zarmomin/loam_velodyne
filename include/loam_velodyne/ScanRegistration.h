@@ -42,7 +42,7 @@
 #include <sensor_msgs/Imu.h>
 
 #include "BasicScanRegistration.h"
-
+#include "RegistrationParams.h"
 
 namespace loam
 {

@@ -35,13 +35,9 @@
 
 
 #include "loam_velodyne/ScanRegistration.h"
-
-#include <sensor_msgs/PointCloud2.h>
-
+#include "loam_velodyne/RegistrationParams.h"
 
 namespace loam {
-
-
 
 /** \brief Class realizing a linear mapping from vertical point angle to the corresponding scan ring.
  *

@@ -33,7 +33,7 @@
 
 #include "loam_velodyne/BasicLaserMapping.h"
 #include "loam_velodyne/nanoflann_pcl.h"
-#include "math_utils.h"
+#include "loam_velodyne/math_utils.h"
 
 #include <Eigen/Eigenvalues>
 #include <Eigen/QR>

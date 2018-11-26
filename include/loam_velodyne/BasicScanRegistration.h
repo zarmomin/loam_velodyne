@@ -2,23 +2,17 @@
 
 #include <utility>
 #include <vector>
-
 #include <pcl/point_cloud.h>
-
 #include "Angle.h"
 #include "Vector3.h"
 #include "CircularBuffer.h"
 #include "time_utils.h"
+#include "RegistrationParams.h"
 
 namespace loam
 {
-
-
-
   /** \brief A pair describing the start end end index of a range. */
   typedef std::pair<size_t, size_t> IndexRange;
-
-
 
   /** Point label options. */
   enum PointLabel
@@ -29,61 +23,7 @@ namespace loam
     SURFACE_FLAT = -1       ///< flat surface point
   };
 
-
-  /** Scan Registration configuration parameters. */
-  class RegistrationParams
-  {
-  public:
-    RegistrationParams(const float& scanPeriod_ = 0.1,
-      const int& imuHistorySize_ = 200,
-      const int& nFeatureRegions_ = 6,
-      const int& curvatureRegion_ = 5,
-      const int& maxCornerSharp_ = 2,
-      const int& maxSurfaceFlat_ = 4,
-      const float& lessFlatFilterSize_ = 0.2,
-      const std::string& outputFrame_ = "/camera",
-      const float& surfaceCurvatureThreshold_ = 0.1);
-
-    /** The time per scan. */
-    float scanPeriod;
-
-    /** The size of the IMU history state buffer. */
-    int imuHistorySize;
-
-    /** The number of (equally sized) regions used to distribute the feature extraction within a scan. */
-    int nFeatureRegions;
-
-    /** The number of surrounding points (+/- region around a point) used to calculate a point curvature. */
-    int curvatureRegion;
-
-    /** The maximum number of sharp corner points per feature region. */
-    int maxCornerSharp;
-
-    /** The maximum number of less sharp corner points per feature region. */
-    int maxCornerLessSharp;
-
-    /** The maximum number of flat surface points per feature region. */
-    int maxSurfaceFlat;
-
-    /** The voxel size used for down sizing the remaining less flat surface points. */
-    float lessFlatFilterSize;
-
-    std::string outputFrame;
-
-    /** The curvature threshold below / above a point is considered a flat / corner point. */
-    float surfaceCurvatureThreshold;
-
-    /** The homogeneous transform between the lidar and the camera frame */
-    Eigen::Matrix4f T_camera_lidar;
-
-    /** The homogeneous transform between the lidar and the camera frame */
-    Eigen::Matrix4f T_camera_imu;
-
-  };
-
-
-
-  /** IMU state data. */
+/** IMU state data. */
   typedef struct IMUState
   {
     /** The time of the measurement leading to this state (in seconds). */
@@ -151,7 +91,7 @@ namespace loam
     */
     void processScanlines(const Time& scanTime, std::vector<pcl::PointCloud<pcl::PointXYZI>> const& laserCloudScans);
 
-    bool configure(const RegistrationParams& config = RegistrationParams()); 
+    bool configure(const RegistrationParams& config = RegistrationParams());
 
     /** \brief Update new IMU state. NOTE: MUTATES ARGS! */
     void updateIMUData(IMUState &newState);

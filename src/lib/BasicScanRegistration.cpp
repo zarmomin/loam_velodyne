@@ -1,41 +1,9 @@
 #include <pcl/filters/voxel_grid.h>
-
 #include "loam_velodyne/BasicScanRegistration.h"
-#include "math_utils.h"
+#include "loam_velodyne/math_utils.h"
 
 namespace loam
 {
-
-RegistrationParams::RegistrationParams(const float& scanPeriod_,
-                                       const int& imuHistorySize_,
-                                       const int& nFeatureRegions_,
-                                       const int& curvatureRegion_,
-                                       const int& maxCornerSharp_,
-                                       const int& maxSurfaceFlat_,
-                                       const float& lessFlatFilterSize_,
-                                       const std::string& outputFrame_,
-                                       const float& surfaceCurvatureThreshold_)
-    : scanPeriod(scanPeriod_),
-      imuHistorySize(imuHistorySize_),
-      nFeatureRegions(nFeatureRegions_),
-      curvatureRegion(curvatureRegion_),
-      maxCornerSharp(maxCornerSharp_),
-      maxCornerLessSharp(10 * maxCornerSharp_),
-      maxSurfaceFlat(maxSurfaceFlat_),
-      lessFlatFilterSize(lessFlatFilterSize_),
-      outputFrame(outputFrame_),
-      surfaceCurvatureThreshold(surfaceCurvatureThreshold_)
-{
-  // todo: load from file and make it EXPLICIT
-  T_camera_lidar << 0, 1, 0, 0,
-      0, 0, 1, 0,
-      1, 0, 0, 0,
-      0, 0, 0, 1;
-  T_camera_imu << 0, 1, 0, 0,
-      0, 0, 1, 0,
-      1, 0, 0, 0,
-      0, 0, 0, 1;
-};
 
 void BasicScanRegistration::processScanlines(const Time& scanTime, std::vector<pcl::PointCloud<pcl::PointXYZI>> const& laserCloudScans)
 {

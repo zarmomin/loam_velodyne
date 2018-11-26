@@ -1,5 +1,4 @@
 add_library(loam
-            math_utils.h
             ScanRegistration.cpp
             BasicScanRegistration.cpp
             MultiScanRegistration.cpp
@@ -8,5 +7,6 @@ add_library(loam
             LaserMapping.cpp
             BasicLaserMapping.cpp
             TransformMaintenance.cpp
-            BasicTransformMaintenance.cpp)
-target_link_libraries(loam ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+            BasicTransformMaintenance.cpp
+            RegistrationParams.cpp)
+target_link_libraries(loam ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${YamlCpp_LIBRARIES})
