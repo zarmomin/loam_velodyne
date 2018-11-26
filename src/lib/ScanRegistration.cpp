@@ -32,7 +32,7 @@
 
 #include "loam_velodyne/ScanRegistration.h"
 #include "math_utils.h"
-
+#include "eigen_conversions/eigen_msg.h"
 #include <tf/transform_datatypes.h>
 
 
@@ -168,24 +168,32 @@ bool ScanRegistration::setupROS(ros::NodeHandle& node, ros::NodeHandle& privateN
 
 void ScanRegistration::handleIMUMessage(const sensor_msgs::Imu::ConstPtr& imuIn)
 {
+  // use tf to get RPY angles, since the results are nicer (i.e. closer to 0) than the Eigen version
   tf::Quaternion orientation;
   tf::quaternionMsgToTF(imuIn->orientation, orientation);
   double roll, pitch, yaw;
   tf::Matrix3x3(orientation).getRPY(roll, pitch, yaw);
 
-  Vector3 acc;
-  acc.x() = float(imuIn->linear_acceleration.y - sin(roll) * cos(pitch) * 9.81);
-  acc.y() = float(imuIn->linear_acceleration.z - cos(roll) * cos(pitch) * 9.81);
-  acc.z() = float(imuIn->linear_acceleration.x + sin(pitch)             * 9.81);
+  // transform & remove gravity acceleration with the following frames
+  // I:imu frame, C:camera frame, W:world frame
+  // C_acc = r_CI * I_a - r_CI * RPY' * W_gravity
+  // the fourth component of the gravity vector and acceleration are set to 0 to ensure that the translational part
+  // of the homogeneous transform T_camera_imu does not get taken into account
+
+  Eigen::Quaterniond orientationIMU;
+  tf::quaternionMsgToEigen(imuIn->orientation, orientationIMU);
+  Eigen::Matrix4f rpy = Eigen::Affine3f(orientationIMU.cast<float>()).matrix();
+  Eigen::Vector4f acceleration(imuIn->linear_acceleration.x, imuIn->linear_acceleration.y, imuIn->linear_acceleration.z, 0);
+  Vector3 acceleration_camera = config().T_camera_imu * acceleration - config().T_camera_imu * rpy.transpose() * Eigen::Vector4f(0,0,9.81f,0);
 
   IMUState newState;
-  newState.stamp = fromROSTime( imuIn->header.stamp);
+  newState.stamp = fromROSTime(imuIn->header.stamp);
   newState.roll = roll;
   newState.pitch = pitch;
   newState.yaw = yaw;
-  newState.acceleration = acc;
+  newState.acceleration = acceleration_camera;
 
-  updateIMUData(acc, newState);
+  updateIMUData(newState);
 }
 
 

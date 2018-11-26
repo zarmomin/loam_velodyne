@@ -9,7 +9,8 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   tf
-  pcl_conversions)
+  pcl_conversions
+  eigen_conversions)
 
 find_package(Eigen3 REQUIRED)
 find_package(PCL REQUIRED)

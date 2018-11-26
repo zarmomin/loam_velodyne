@@ -25,7 +25,17 @@ RegistrationParams::RegistrationParams(const float& scanPeriod_,
       lessFlatFilterSize(lessFlatFilterSize_),
       outputFrame(outputFrame_),
       surfaceCurvatureThreshold(surfaceCurvatureThreshold_)
-{};
+{
+  // todo: load from file and make it EXPLICIT
+  T_camera_lidar << 0, 1, 0, 0,
+      0, 0, 1, 0,
+      1, 0, 0, 0,
+      0, 0, 0, 1;
+  T_camera_imu << 0, 1, 0, 0,
+      0, 0, 1, 0,
+      1, 0, 0, 0,
+      0, 0, 0, 1;
+};
 
 void BasicScanRegistration::processScanlines(const Time& scanTime, std::vector<pcl::PointCloud<pcl::PointXYZI>> const& laserCloudScans)
 {
@@ -81,21 +91,21 @@ void BasicScanRegistration::reset(const Time& scanTime)
 }
 
 
-void BasicScanRegistration::updateIMUData(Vector3& acc, IMUState& newState)
+void BasicScanRegistration::updateIMUData(IMUState &newState)
 {
   if (_imuHistory.size() > 0) {
     // accumulate IMU position and velocity over time
-    rotateZXY(acc, newState.roll, newState.pitch, newState.yaw);
+    rotateZXY(newState.acceleration, newState.roll, newState.pitch, newState.yaw);
 
     const IMUState& prevState = _imuHistory.last();
     float timeDiff = toSec(newState.stamp - prevState.stamp);
     newState.position = prevState.position
                         + (prevState.velocity * timeDiff)
-                        + (0.5 * acc * timeDiff * timeDiff);
+                        + (0.5 * newState.acceleration * timeDiff * timeDiff);
     newState.velocity = prevState.velocity
-                        + acc * timeDiff;
+                        + newState.acceleration * timeDiff;
   }
-
+  //todo: make sure that the first position & velocity estimate is actually 0,0,0
   _imuHistory.push(newState);
 }
 

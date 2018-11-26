@@ -3,7 +3,8 @@
 
 
 #include <pcl/point_types.h>
-
+#include <math.h>
+#include <cmath>
 
 namespace loam {
 
@@ -13,17 +14,20 @@ namespace loam {
 class Vector3 : public Eigen::Vector4f {
 public:
   Vector3(float x, float y, float z)
-      : Eigen::Vector4f(x, y, z, 0) {}
+      : Eigen::Vector4f(x, y, z, 1) {}
 
   Vector3(void)
-      : Eigen::Vector4f(0, 0, 0, 0) {}
+      : Eigen::Vector4f(0, 0, 0, 1) {}
 
   template<typename OtherDerived>
   Vector3(const Eigen::MatrixBase <OtherDerived> &other)
       : Eigen::Vector4f(other) {}
 
   Vector3(const pcl::PointXYZI &p)
-      : Eigen::Vector4f(p.x, p.y, p.z, 0) {}
+      : Eigen::Vector4f(p.x, p.y, p.z, 1) {}
+
+  Vector3(const pcl::PointXYZ &p)
+      : Eigen::Vector4f(p.x, p.y, p.z, 1) {}
 
   template<typename OtherDerived>
   Vector3 &operator=(const Eigen::MatrixBase <OtherDerived> &rhs) {
@@ -44,6 +48,12 @@ public:
     z() = rhs.z;
     return *this;
   }
+
+  inline float NormSquared() { return x() * x() + y() * y() + z() * z(); }
+
+  inline float Norm() { return sqrtf(NormSquared()); }
+
+  inline bool IsNanOrInf() { return !(std::isfinite(x()) && std::isfinite(y()) && std::isfinite(z())); }
 
   float x() const { return (*this)(0); }
 

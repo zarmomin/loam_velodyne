@@ -34,7 +34,7 @@
 #include "math_utils.h"
 
 #include <pcl_conversions/pcl_conversions.h>
-
+#include <loam_velodyne/MultiScanRegistration.h>
 
 namespace loam {
 
@@ -141,8 +141,19 @@ bool MultiScanRegistration::setupROS(ros::NodeHandle& node, ros::NodeHandle& pri
 
   return true;
 }
-
-
+pcl::PointXYZI MultiScanRegistration::convertToCameraCoordinateSystem(const Vector3& point_lidar) {
+  pcl::PointXYZI point_camera;
+  point_camera.x = point_lidar.y();
+  point_camera.y = point_lidar.z();
+  point_camera.z = point_lidar.x();
+  Eigen::Matrix4f lidar_camera;
+  lidar_camera << 0, 1, 0, 0,
+                  0, 0, 1, 0,
+                  1, 0, 0, 0,
+                  0, 0, 0, 1;
+  Vector3 test = lidar_camera * point_lidar;
+  return point_camera;
+}
 
 void MultiScanRegistration::handleCloudMessage(const sensor_msgs::PointCloud2ConstPtr &laserCloudMsg)
 {
@@ -177,27 +188,21 @@ void MultiScanRegistration::process(const pcl::PointCloud<pcl::PointXYZ>& laserC
 
   bool halfPassed = false;
   pcl::PointXYZI point;
+  Vector3 laser_point;
   _laserCloudScans.resize(_scanMapper.getNumberOfScanRings());
   // clear all scanline points
   std::for_each(_laserCloudScans.begin(), _laserCloudScans.end(), [](auto&&v) {v.clear(); }); 
 
   // extract valid points from input cloud
   for (int i = 0; i < cloudSize; i++) {
-    point.x = laserCloudIn[i].y;
-    point.y = laserCloudIn[i].z;
-    point.z = laserCloudIn[i].x;
+    laser_point = Vector3(laserCloudIn[i]);
 
-    // skip NaN and INF valued points
-    if (!pcl_isfinite(point.x) ||
-        !pcl_isfinite(point.y) ||
-        !pcl_isfinite(point.z)) {
+    // skip NaN and INF or zero valued points
+    if (laser_point.IsNanOrInf() || laser_point.NormSquared() < 1e-4) {
       continue;
     }
 
-    // skip zero valued points
-    if (point.x * point.x + point.y * point.y + point.z * point.z < 0.0001) {
-      continue;
-    }
+    point = convertToCameraCoordinateSystem(laser_point);
 
     // calculate vertical point angle and scan ID
     float angle = std::atan(point.y / std::sqrt(point.x * point.x + point.z * point.z));

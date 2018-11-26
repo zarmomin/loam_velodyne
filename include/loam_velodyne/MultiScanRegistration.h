@@ -134,6 +134,12 @@ private:
    */
   void process(const pcl::PointCloud<pcl::PointXYZ>& laserCloudIn, const Time& scanTime);
 
+  /** \brief Converts a point from the lidar to the camera coordinate system
+   *
+   * @param point_lidar to transform
+   **/
+  pcl::PointXYZI convertToCameraCoordinateSystem(const Vector3& point_lidar);
+
 private:
   int _systemDelay = 20;             ///< system startup delay counter
   MultiScanMapper _scanMapper;  ///< mapper for mapping vertical point angles to scan ring IDs

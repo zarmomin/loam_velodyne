@@ -72,6 +72,13 @@ namespace loam
 
     /** The curvature threshold below / above a point is considered a flat / corner point. */
     float surfaceCurvatureThreshold;
+
+    /** The homogeneous transform between the lidar and the camera frame */
+    Eigen::Matrix4f T_camera_lidar;
+
+    /** The homogeneous transform between the lidar and the camera frame */
+    Eigen::Matrix4f T_camera_imu;
+
   };
 
 
@@ -147,7 +154,7 @@ namespace loam
     bool configure(const RegistrationParams& config = RegistrationParams()); 
 
     /** \brief Update new IMU state. NOTE: MUTATES ARGS! */
-    void updateIMUData(Vector3& acc, IMUState& newState);
+    void updateIMUData(IMUState &newState);
 
     /** \brief Project a point to the start of the sweep using corresponding IMU data
     *
